@@ -1,0 +1,22 @@
+{
+  "name": "testapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "postinstall": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1",
+    "prisma": "^5.22.0",
+    "@prisma/client": "^5.22.0"
+  }
+}
