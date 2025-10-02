@@ -1,12 +1,27 @@
-<!doctype html><meta charset="utf-8">
+<!doctype html><meta charset="utf-8" />
+<title>MVP</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<h1>LIFF Demo</h1>
-<pre id="out">loading…</pre>
+<h1>首頁</h1>
+<button id="btn-continue" disabled>繼續修練</button>
+<button onclick="location.href='library.html'">藏經閣</button>
+<button onclick="location.href='admin.html'">新經典</button>
 <script>
 (async () => {
-  await liff.init({ liffId: "2008219762-1wWOGmeK" });
-  const res = await fetch("/posts");
-  const data = await res.json();
-  document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+  await liff.init({ liffId: "你的_LIFF_ID" });
+  const profile = await liff.getProfile();
+  // 確保使用者存在，並記一次登入
+  await fetch('/api/auth/ensure', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ userId: profile.userId, displayName: profile.displayName })
+  });
+  await fetch('/api/ping', { method:'POST', headers:{'x-user-id': profile.userId,'Content-Type':'application/json'}, body: JSON.stringify({ usageSeconds: 0 }) });
+
+  const r = await fetch('/api/home', { headers:{'x-user-id': profile.userId}});
+  const s = await r.json();
+  const btn = document.getElementById('btn-continue');
+  if (s.canContinue) {
+    btn.disabled = false;
+    btn.onclick = ()=> location.href = `continue.html?chapter=${s.lastChapterId}&p=${s.lastParagraph||1}`;
+  }
 })();
 </script>

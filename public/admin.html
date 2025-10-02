@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8" /><title>匯入經典</title>
+<h3>匯入</h3>
+<label>經典名稱 <input id="name"></label><br>
+<label>篇名 <input id="chap" value="第一篇"></label><br>
+<textarea id="full" rows="10" cols="60" placeholder="貼上全文"></textarea><br>
+<button id="go">匯入</button>
+<pre id="out"></pre>
+<script>
+document.getElementById('go').onclick=async()=>{
+  const body={
+    workName: document.getElementById('name').value.trim(),
+    chapterTitle: document.getElementById('chap').value.trim(),
+    fulltext: document.getElementById('full').value
+  };
+  const r = await fetch('/api/admin/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  document.getElementById('out').textContent = JSON.stringify(await r.json(),null,2);
+};
+</script>

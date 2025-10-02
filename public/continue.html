@@ -1,0 +1,53 @@
+<!doctype html><meta charset="utf-8" /><title>繼續修練</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<h2 id="title">繼續修練</h2>
+<div id="list"></div>
+<button id="report">錯誤回報</button>
+<script>
+const q = new URLSearchParams(location.search);
+const chapterId = Number(q.get('chapter')); let cur = Number(q.get('p')||1);
+let userId=""; let tick=null, practice=0;
+
+function render(paras){
+  const box=document.getElementById('list'); box.innerHTML="";
+  paras.forEach(p=>{
+    const d=document.createElement('div');
+    d.textContent = p.order + '．' + p.text;
+    d.style.margin='12px 0';
+    d.style.opacity = p.order===cur? '1':'0.4';
+    d.style.fontWeight = p.order===cur? '700':'400';
+    d.onclick=()=>{ cur=p.order; render(paras); };
+    box.appendChild(d);
+  });
+}
+
+(async ()=>{
+  await liff.init({ liffId: "你的_LIFF_ID" });
+  userId = (await liff.getProfile()).userId;
+
+  const r = await fetch(`/api/chapters/${chapterId}/paragraphs`);
+  const paras = await r.json(); render(paras);
+
+  // 每 10s 回報一次練習時數
+  tick = setInterval(()=> practice+=10, 10000);
+
+  // 5 分鐘閒置提醒 → 回首頁
+  let last = Date.now();
+  document.addEventListener('mousemove', ()=> last=Date.now());
+  setInterval(()=>{ if(Date.now()-last>5*60*1000) location.href='index.html'; }, 30000);
+
+  // 錯誤回報
+  document.getElementById('report').onclick=async()=>{
+    const msg = prompt('描述問題：'); if(!msg) return;
+    await fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json','x-user-id':userId},
+      body: JSON.stringify({ chapterId, paragraph: cur, message: msg })});
+    alert('已送出');
+  };
+
+  // 離開頁面時記錄進度與練習時數
+  window.addEventListener('beforeunload', async ()=>{
+    await fetch('/api/progress',{method:'POST',headers:{'Content-Type':'application/json','x-user-id':userId},
+      body: JSON.stringify({ chapterId, currentParagraph: cur, practiceSeconds: practice })});
+  });
+})();
+</script>

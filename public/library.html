@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8" /><title>藏經閣</title>
+<script>
+(async ()=>{
+  const r = await fetch('/api/works'); const works = await r.json();
+  const root = document.body;
+  works.forEach(w=>{
+    const h=document.createElement('h3'); h.textContent = w.name; root.appendChild(h);
+    w.chapters.sort((a,b)=>a.order-b.order).forEach(c=>{
+      const a=document.createElement('a');
+      a.href=`continue.html?chapter=${c.id}&p=1`; a.textContent='・'+c.title; a.style.display='block';
+      root.appendChild(a);
+    });
+  });
+})();
+</script>
