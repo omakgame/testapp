@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8">
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<h1>LIFF Demo</h1>
+<pre id="out">loading…</pre>
+<script>
+(async () => {
+  await liff.init({ liffId: "2008219762-1wWOGmeK" });
+  const res = await fetch("/posts");
+  const data = await res.json();
+  document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+})();
+</script>
